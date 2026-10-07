@@ -1,0 +1,5 @@
+ticker,quantity,price,daily_volatility
+AAPL,100,400,0.018
+MSFT,100,300,0.015
+TLT,200,100,0.009
+CASH,1,10000,0.0
