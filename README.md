@@ -10,12 +10,26 @@ Portfolio Risk X-Ray is a small, deliberately scoped analysis tool. It is not a 
 
 - Python 3.11+
 - pandas for data loading and tabular calculations
-- pytest, with 56 automated tests
+- pytest, with 93 automated tests
 - Deterministic portfolio valuation
 - Strict financial-data validation
 - Concentration monitoring
 - Weighted volatility exposure
-- Finance logic separated from presentation
+- Optional Streamlit interface, with finance logic separated from presentation
+
+![Portfolio Risk X-Ray interface](docs/portfolio-risk-xray.png)
+
+## Interface
+
+The Streamlit interface presents the result of `analyse_portfolio` through three visuals. Each one answers a single question, and none of them performs a calculation of its own.
+
+**Portfolio X-Ray.** A segmented 100% allocation band in which each segment's width is the position's actual portfolio weight. It shows the composition of the portfolio at a glance, and an amber edge marks any position above the concentration threshold.
+
+**Concentration Scan.** One equal-sized circular ring per position. Ring progress represents portfolio weight: blue shows the allocation up to the concentration threshold, and amber shows only the excess above it. A tick marks the threshold on every ring. Circle size does not encode weight.
+
+**Weighted Volatility Exposure.** A horizontal breakdown of each position's `weighted_volatility_component`, with each value labelled directly and the total stated alongside. Correlation is not included; see [What this project intentionally does not claim](#what-this-project-intentionally-does-not-claim).
+
+Exact figures remain available below the visuals, in the Exposure Breakdown table and the Calculation Trace, which shows each formula applied to the portfolio's own values.
 
 ## Design intent
 
@@ -32,6 +46,7 @@ flowchart TD
     valuation --> risk["risk.py"]
     risk --> analysis["analysis.py"]
     analysis --> result["analysis result"]
+    result --> app["Streamlit interface (app/)"]
 ```
 
 | Module | Responsibility |
@@ -41,7 +56,7 @@ flowchart TD
 | `risk.py` | Flags concentrated positions, finds the largest position and calculates weighted volatility exposure. |
 | `analysis.py` | Runs the steps above in order and returns one result. It contains no formulas of its own. |
 
-DataFrame transformation functions return new DataFrames rather than mutating their inputs. Scalar and summary functions read from those derived results. Finance logic remains independent of presentation.
+DataFrame transformation functions return new DataFrames rather than mutating their inputs. Scalar and summary functions read from those derived results. Finance logic remains independent of presentation: the interface in `app/` only formats the values returned by `analyse_portfolio`, and the library does not depend on Streamlit.
 
 ## Golden example
 
@@ -177,7 +192,7 @@ The loader deliberately rejects:
 - missing or unexpected columns (the four required columns may appear in any order)
 - malformed rows, including rows with more fields than the header
 - blank rows inside the dataset
-- empty files and missing files
+- empty files, missing files and files that are not valid UTF-8 text
 
 Rejecting `daily_volatility > 1.0` is a deliberate V1 data-quality guardrail, not a mathematical limit: daily volatility above 100% is possible. The guardrail is designed in part to catch percentage-format mistakes, such as entering `1.8` instead of `0.018` for 1.8%, which would otherwise be accepted silently as 180% per day.
 
@@ -185,7 +200,7 @@ Zero volatility is allowed, which is how cash is represented. Cash is an ordinar
 
 ## Testing
 
-The project currently has **56 passing pytest tests**.
+The project currently has **93 passing pytest tests**.
 
 | Area | What is proven |
 |---|---|
@@ -196,6 +211,14 @@ The project currently has **56 passing pytest tests**.
 | Concentration | The 25% default flags only AAPL and MSFT, a 40% threshold does not flag AAPL, and invalid thresholds are rejected. |
 | Weighted volatility exposure | Golden components match the hand calculation, the exposure is approximately 0.0135, and cash contributes zero. |
 | End-to-end orchestration | `analyse_portfolio` returns the complete expected result, passes a custom threshold through, and preserves error behaviour. |
+| Presentation formatting | Currency, percentage and threshold formatting, metric hierarchy, and error messages that show the uploaded file name rather than an internal path. |
+| Allocation band | Segment widths equal engine weights, every position keeps its own segment, and narrow segments fall back to labels beneath the band. |
+| Concentration rings | One equal-sized ring per position, with blue and amber arcs split exactly at the threshold and states taken from the engine's flags. |
+| Weighted volatility visual | Bars and labels use the engine's components and total, and an all-cash portfolio with zero exposure renders without error. |
+| Exposure Breakdown and Calculation Trace | Table columns and values, and trace lines that show each formula with the golden values. |
+| HTML escaping | Tickers, file names and error text containing markup or quote characters are escaped in every custom HTML helper. |
+
+The interface tests check the HTML produced by the presentation helpers. There is no browser-based end-to-end test suite.
 
 Run the tests from the repository root with the virtual environment activated:
 
@@ -212,20 +235,39 @@ git clone https://github.com/AminQuantSystems/portfolio-risk-xray.git
 cd portfolio-risk-xray
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,app]"
 python -m pytest -v
 ```
 
 If `python` is not on your PATH, use the Python launcher instead: `py -m venv .venv`.
 
-The only runtime dependency is pandas. pytest is a development dependency.
+pandas is the finance library's only core runtime dependency. Streamlit is an optional `app` extra, needed only for the interface, and pytest is in the `dev` extra. To install the library alone, use `python -m pip install -e .`.
+
+## Running the application
+
+From the repository root, with the virtual environment activated:
+
+```powershell
+python -m streamlit run app/streamlit_app.py
+```
+
+The application analyses the sample portfolio in `data/sample_portfolio.csv` by default. A different portfolio can be uploaded as a CSV file from the sidebar, where the concentration threshold can also be changed. Uploaded files are subject to the same validation rules as the library, and invalid data stops the analysis with an error message.
 
 ## Repository structure
 
 ```text
 portfolio-risk-xray/
+├── .streamlit/
+│   └── config.toml              # interface theme and upload limit
+├── app/
+│   ├── __init__.py
+│   ├── streamlit_app.py         # Streamlit entry point
+│   ├── ui_helpers.py            # presentation helpers, no finance calculations
+│   └── styles.css               # interface stylesheet
 ├── data/
 │   └── sample_portfolio.csv     # golden £100,000 portfolio
+├── docs/
+│   └── portfolio-risk-xray.png  # interface screenshot
 ├── src/
 │   └── portfolio_risk/
 │       ├── __init__.py
@@ -239,7 +281,8 @@ portfolio-risk-xray/
 │   ├── test_validation.py
 │   ├── test_valuation.py
 │   ├── test_risk.py
-│   └── test_analysis.py
+│   ├── test_analysis.py
+│   └── test_app_helpers.py      # presentation helpers and HTML escaping
 ├── README.md
 └── pyproject.toml
 ```
@@ -248,12 +291,10 @@ portfolio-risk-xray/
 
 Planned:
 
-- Risk X-Ray visual interface
 - scenario stress testing
 - covariance-based portfolio volatility
-- historical return analysis
+- historical-return analysis
 - drawdown metrics
-- clearer portfolio-risk visualisation
 
 Possible later research, not committed: Value at Risk, Monte Carlo simulation and portfolio optimisation.
 
@@ -263,5 +304,5 @@ Possible later research, not committed: Value at Risk, Monte Carlo simulation an
 - **Explicit assumptions.** Units, sign conventions and threshold semantics are stated, not implied.
 - **Separation of finance logic from presentation.** Calculations live in a tested library that any interface can call.
 - **No silent financial-data repair.** Invalid data stops the analysis with a clear error.
-- **Small tested modules.** Each module has one responsibility and its own test file.
+- **Small tested modules.** Each library module has one responsibility and its own test file.
 - **Hand-checkable golden fixtures.** The sample portfolio is designed so every result can be verified with a calculator.
