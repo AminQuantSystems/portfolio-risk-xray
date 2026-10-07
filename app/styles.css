@@ -1,0 +1,281 @@
+:root {
+  --xr-bg: #0f1724;
+  --xr-border: #253145;
+  --xr-text: #d6dee9;
+  --xr-muted: #8492a6;
+  --xr-accent: #4c8dd6;
+  --xr-seg: #3d5f84;
+  --xr-seg-alt: #33506f;
+  --xr-warn: #c9a34a;
+}
+
+[data-testid="stMainBlockContainer"] {
+  padding-top: 3.5rem;
+  max-width: 1180px;
+}
+
+[data-testid="stSidebar"] {
+  border-right: 1px solid var(--xr-border);
+}
+
+.xr-header { margin-bottom: 1.5rem; }
+.xr-title { font-size: 1.3rem; font-weight: 600; letter-spacing: 0.01em; color: var(--xr-text); }
+.xr-subtitle { font-size: 0.8rem; color: var(--xr-muted); margin-top: 0.1rem; }
+.xr-source { font-size: 0.72rem; color: var(--xr-muted); margin-top: 0.5rem; }
+
+.xr-label,
+.xr-section,
+.xr-sidebar-title,
+.xr-chart-title,
+.xr-table th {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.xr-label,
+.xr-sidebar-title,
+.xr-table th { color: var(--xr-muted); }
+.xr-section,
+.xr-chart-title { color: var(--xr-text); }
+
+.xr-section {
+  margin: 2rem 0 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--xr-border);
+}
+
+.xr-value,
+.xr-supporting,
+.xr-seg,
+.xr-band-small,
+.xr-bar-label,
+.xr-total-value,
+.xr-xray-total,
+.xr-table td,
+.xr-example {
+  font-variant-numeric: tabular-nums;
+}
+
+.xr-note { font-size: 0.7rem; color: var(--xr-muted); margin-top: 0.15rem; }
+
+/* Metric strip: hierarchy comes from type size, not from cards. */
+.xr-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.25rem 2.5rem;
+}
+.xr-metric.is-primary { flex: 1.4 1 14rem; }
+.xr-metric.is-secondary { flex: 1 1 11rem; padding-left: 1.25rem; border-left: 1px solid var(--xr-border); }
+.xr-value { font-weight: 600; color: var(--xr-text); margin-top: 0.25rem; line-height: 1.1; }
+.is-primary .xr-value { font-size: 2.4rem; }
+.is-secondary .xr-value { font-size: 1.45rem; }
+
+.xr-supporting {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.75rem;
+  margin-top: 1rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--xr-border);
+  font-size: 0.78rem;
+  color: var(--xr-muted);
+}
+.xr-supporting b { color: var(--xr-text); font-weight: 600; }
+.xr-breaches.is-above,
+.xr-breaches.is-above b { color: var(--xr-warn); }
+
+/* Portfolio X-Ray band */
+.xr-xray { margin-top: 2.25rem; }
+.xr-xray-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 0.6rem;
+}
+.xr-xray-title { font-size: 1rem; font-weight: 600; color: var(--xr-text); }
+.xr-xray-total { font-size: 0.78rem; color: var(--xr-muted); white-space: nowrap; }
+.xr-question { font-size: 0.78rem; color: var(--xr-muted); margin-top: 0.15rem; }
+
+.xr-band { display: flex; width: 100%; height: 4.25rem; }
+
+/* The right border is the background colour, so it reads as a gap without changing widths. */
+.xr-seg {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Keeps a visible fill beside the 2px gap however small the weight. */
+  min-width: 4px;
+  overflow: hidden;
+  padding: 0 clamp(0.25rem, 1vw, 0.6rem);
+  border-right: 2px solid var(--xr-bg);
+  border-top: 3px solid transparent;
+  background: var(--xr-seg);
+  color: #eef3f9;
+  white-space: nowrap;
+  container-type: inline-size;
+}
+.xr-seg:last-child { border-right: 0; }
+/* Padding would set a minimum width and distort the allocation, so unlabelled segments have none. */
+.xr-seg:empty { padding: 0; }
+.xr-seg.is-alt { background: var(--xr-seg-alt); }
+.xr-seg.is-above { border-top-color: var(--xr-warn); }
+.xr-seg-ticker { font-size: 0.95rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+.xr-seg-weight { font-size: 0.8rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+
+/* Tighten labels in segments that are narrow on screen, rather than truncating them. */
+@container (max-width: 5rem) {
+  .xr-seg-ticker { font-size: 0.72rem; }
+  .xr-seg-weight { font-size: 0.68rem; }
+}
+
+.xr-band-small {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: var(--xr-muted);
+}
+.xr-band-small b { color: var(--xr-text); }
+.xr-band-small.is-fallback-only,
+.xr-fallback { display: none; }
+
+/* On a narrow band, mid-sized segments move their label beneath the band. */
+.xr-xray { container: xray / inline-size; }
+@container xray (max-width: 40rem) {
+  .xr-seg.is-tight span { display: none; }
+  .xr-band-small.is-fallback-only { display: flex; }
+  .xr-fallback { display: inline; }
+}
+
+.xr-chart-note { margin-top: 0.6rem; font-size: 0.7rem; color: var(--xr-muted); }
+
+/* Diagnostic pair: side by side when there is room, stacked otherwise. */
+.xr-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(21rem, 100%), 1fr));
+  gap: 2rem 3rem;
+  margin-top: 2.25rem;
+}
+.xr-chart .xr-question { margin-bottom: 0.75rem; }
+
+/* Ticker | plot. The plot keeps a right margin so end labels never collide. */
+.xr-row {
+  display: grid;
+  grid-template-columns: 3.75rem 1fr;
+  align-items: stretch;
+  font-size: 0.8rem;
+  color: var(--xr-text);
+}
+
+.xr-ticker { align-self: center; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.xr-plot { position: relative; height: 2rem; margin-right: 3.5rem; }
+.xr-bar {
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  bottom: 0.55rem;
+  background: var(--xr-accent);
+}
+.xr-bar-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  margin-left: 0.25rem;
+  padding: 0 0.2rem;
+  background: var(--xr-bg);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* Concentration scan: every ring has the same size; only the arc lengths vary. */
+.xr-rings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(4.75rem, 1fr));
+  gap: 1rem 0.5rem;
+}
+.xr-ring { min-width: 0; text-align: center; }
+/* Grid columns are always equal width, so every dial is the same size. */
+.xr-ring-dial { position: relative; width: 100%; max-width: 6.25rem; aspect-ratio: 1; margin: 0 auto; }
+
+.xr-scan-threshold { margin: -0.35rem 0 0.75rem; font-size: 0.72rem; color: var(--xr-muted); }
+.xr-scan-threshold b { color: var(--xr-text); font-weight: 600; }
+.xr-ring-svg { display: block; width: 100%; height: 100%; }
+.xr-ring-svg circle { fill: none; stroke-width: 8; }
+.xr-ring-track { stroke: var(--xr-border); }
+.xr-ring-blue { stroke: var(--xr-accent); }
+.xr-ring-amber { stroke: var(--xr-warn); }
+.xr-ring-tick { stroke: var(--xr-text); stroke-width: 2; }
+.xr-ring-weight {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--xr-text);
+  font-variant-numeric: tabular-nums;
+}
+.xr-ring-ticker {
+  margin-top: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--xr-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.xr-state { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; color: var(--xr-muted); }
+.is-above .xr-state { color: var(--xr-warn); }
+
+.xr-total { margin-bottom: 0.6rem; }
+.xr-total-value { font-size: 1.6rem; font-weight: 600; line-height: 1.15; color: var(--xr-text); }
+.xr-total-label { font-size: 0.72rem; color: var(--xr-muted); margin-top: 0.1rem; }
+
+.xr-table-wrap { overflow-x: auto; }
+.xr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  color: var(--xr-text);
+}
+.xr-table th,
+.xr-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--xr-border);
+  text-align: right;
+}
+.xr-table th:first-child,
+.xr-table td:first-child { text-align: left; }
+.xr-table td:first-child { font-weight: 600; }
+.xr-table tr.is-above td:last-child { color: var(--xr-warn); }
+
+.xr-trace { font-size: 0.8rem; color: var(--xr-text); }
+.xr-formula { display: block; font-size: 0.78rem; color: var(--xr-accent); margin-bottom: 0.4rem; }
+.xr-example { margin-bottom: 0.3rem; }
+
+.xr-error {
+  border: 1px solid var(--xr-warn);
+  border-radius: 3px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--xr-text);
+}
+.xr-error-title { font-weight: 600; color: var(--xr-warn); margin-bottom: 0.25rem; }
+
+.xr-assumptions,
+.xr-footnote {
+  font-size: 0.7rem;
+  color: var(--xr-muted);
+}
+.xr-assumptions { margin-top: 0.75rem; }
+.xr-footnote { margin-top: 1.5rem; }
