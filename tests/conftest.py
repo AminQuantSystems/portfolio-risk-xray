@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from portfolio_risk.validation import load_portfolio
+from portfolio_risk.valuation import value_portfolio
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -18,6 +19,12 @@ def golden_csv_path() -> Path:
 def golden_portfolio(golden_csv_path: Path) -> pd.DataFrame:
     """The validated £100,000 golden portfolio."""
     return load_portfolio(golden_csv_path)
+
+
+@pytest.fixture
+def golden_valued_portfolio(golden_portfolio: pd.DataFrame) -> pd.DataFrame:
+    """The golden portfolio with market_value and weight added."""
+    return value_portfolio(golden_portfolio)
 
 
 @pytest.fixture
