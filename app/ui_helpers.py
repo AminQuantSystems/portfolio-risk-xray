@@ -259,7 +259,8 @@ def calculation_trace(analysis: dict[str, Any]) -> list[tuple[str, str]]:
                 f"{ticker}: {format_percent(row['weight'])} > {format_percent(threshold)}"
                 f" is {'true' if row['above_threshold'] else 'false'},"
                 f" so {concentration_label(row['above_threshold']).lower()}",
-                "Strictly greater than. A weight equal to the threshold is not flagged.",
+                "Strictly greater than. A weight equal to the threshold is not flagged. "
+                "Displayed values are rounded; the comparison uses the exact weight.",
             ),
         ),
         (

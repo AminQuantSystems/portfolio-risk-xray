@@ -10,7 +10,10 @@ from typing import Any
 
 import streamlit as st
 
-from app.ui_helpers import (
+from portfolio_risk.analysis import analyse_portfolio
+from portfolio_risk.risk import DEFAULT_CONCENTRATION_THRESHOLD
+from portfolio_risk.validation import PortfolioDataError
+from ui_helpers import (
     allocation_band_html,
     calculation_trace,
     concentration_scan_html,
@@ -22,9 +25,6 @@ from app.ui_helpers import (
     user_error_message,
     weighted_volatility_chart_html,
 )
-from portfolio_risk.analysis import analyse_portfolio
-from portfolio_risk.risk import DEFAULT_CONCENTRATION_THRESHOLD
-from portfolio_risk.validation import PortfolioDataError
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SAMPLE_PATH = PROJECT_ROOT / "data" / "sample_portfolio.csv"

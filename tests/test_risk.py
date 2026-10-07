@@ -9,6 +9,8 @@ from portfolio_risk.risk import (
     largest_position,
     weighted_volatility_exposure,
 )
+from portfolio_risk.validation import load_portfolio
+from portfolio_risk.valuation import value_portfolio
 
 GOLDEN_TICKERS = ["AAPL", "MSFT", "TLT", "CASH"]
 
@@ -19,6 +21,21 @@ def test_largest_position_is_aapl_at_40_percent(golden_valued_portfolio):
     assert isinstance(largest, dict)
     assert set(largest) == {"ticker", "weight"}
     assert largest["ticker"] == "AAPL"
+    assert largest["weight"] == pytest.approx(0.40)
+
+
+def test_largest_position_tie_returns_first_ticker_in_file_order(write_csv):
+    path = write_csv(
+        "ticker,quantity,price,daily_volatility\n"
+        "SMALL,50,100,0.01\n"
+        "FIRST,100,100,0.02\n"
+        "SECOND,100,100,0.01\n"
+    )
+    valued = value_portfolio(load_portfolio(path))
+
+    largest = largest_position(valued)
+
+    assert largest["ticker"] == "FIRST"
     assert largest["weight"] == pytest.approx(0.40)
 
 

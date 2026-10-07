@@ -37,6 +37,15 @@ def test_ticker_case_is_normalised_to_uppercase(write_csv):
     assert load_portfolio(path)["ticker"].tolist() == ["AAPL", "MSFT"]
 
 
+def test_ticker_na_is_kept_as_literal_ticker(write_csv):
+    path = write_csv(csv_text("NA,100,400,0.018", VALID_ROW))
+
+    tickers = load_portfolio(path)["ticker"]
+
+    assert tickers.tolist() == ["NA", "MSFT"]
+    assert not tickers.isna().any()
+
+
 def test_missing_ticker_rejected(write_csv):
     path = write_csv(csv_text(VALID_ROW, ",100,400,0.018"))
 

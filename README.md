@@ -10,7 +10,7 @@ Portfolio Risk X-Ray is a small, deliberately scoped analysis tool. It is not a 
 
 - Python 3.11+
 - pandas for data loading and tabular calculations
-- pytest, with 93 automated tests
+- pytest, with 96 automated tests
 - Deterministic portfolio valuation
 - Strict financial-data validation
 - Concentration monitoring
@@ -200,15 +200,15 @@ Zero volatility is allowed, which is how cash is represented. Cash is an ordinar
 
 ## Testing
 
-The project currently has **93 passing pytest tests**.
+The project currently has **96 passing pytest tests**.
 
 | Area | What is proven |
 |---|---|
 | Package and import | The package and pandas import correctly. |
-| CSV validation | The golden CSV loads with the expected values and dtypes, and every rejection rule above raises `PortfolioDataError`. |
+| CSV validation | The golden CSV loads with the expected values and dtypes, every rejection rule above raises `PortfolioDataError`, and a ticker such as `NA` is kept as written rather than read as missing. |
 | Valuation | Golden market values are exactly £40,000, £30,000, £20,000 and £10,000, and the total is £100,000. Zero and non-finite totals are rejected. |
 | Portfolio weights | Golden weights are 40%, 30%, 20% and 10% and sum to 1. Inputs are not mutated and row order is preserved. |
-| Concentration | The 25% default flags only AAPL and MSFT, a 40% threshold does not flag AAPL, and invalid thresholds are rejected. |
+| Concentration | The 25% default flags only AAPL and MSFT, a 40% threshold does not flag AAPL, invalid thresholds are rejected, and a tie for the largest position returns the first ticker in file order. |
 | Weighted volatility exposure | Golden components match the hand calculation, the exposure is approximately 0.0135, and cash contributes zero. |
 | End-to-end orchestration | `analyse_portfolio` returns the complete expected result, passes a custom threshold through, and preserves error behaviour. |
 | Presentation formatting | Currency, percentage and threshold formatting, metric hierarchy, and error messages that show the uploaded file name rather than an internal path. |
@@ -217,8 +217,9 @@ The project currently has **93 passing pytest tests**.
 | Weighted volatility visual | Bars and labels use the engine's components and total, and an all-cash portfolio with zero exposure renders without error. |
 | Exposure Breakdown and Calculation Trace | Table columns and values, and trace lines that show each formula with the golden values. |
 | HTML escaping | Tickers, file names and error text containing markup or quote characters are escaped in every custom HTML helper. |
+| Application smoke test | Streamlit's `AppTest` runs `app/streamlit_app.py` on the sample portfolio and confirms it renders without exceptions. |
 
-The interface tests check the HTML produced by the presentation helpers. There is no browser-based end-to-end test suite.
+The interface tests check the HTML produced by the presentation helpers, plus one headless run of the application script. There is no browser-based end-to-end test suite.
 
 Run the tests from the repository root with the virtual environment activated:
 
@@ -241,6 +242,12 @@ python -m pytest -v
 
 If `python` is not on your PATH, use the Python launcher instead: `py -m venv .venv`.
 
+On macOS or Linux, use `python3 -m venv .venv` and activate the environment with:
+
+```bash
+source .venv/bin/activate
+```
+
 pandas is the finance library's only core runtime dependency. Streamlit is an optional `app` extra, needed only for the interface, and pytest is in the `dev` extra. To install the library alone, use `python -m pip install -e .`.
 
 ## Running the application
@@ -257,10 +264,12 @@ The application analyses the sample portfolio in `data/sample_portfolio.csv` by 
 
 ```text
 portfolio-risk-xray/
+├── .github/
+│   └── workflows/
+│       └── tests.yml            # runs the test suite on Python 3.11 and 3.13
 ├── .streamlit/
 │   └── config.toml              # interface theme and upload limit
 ├── app/
-│   ├── __init__.py
 │   ├── streamlit_app.py         # Streamlit entry point
 │   ├── ui_helpers.py            # presentation helpers, no finance calculations
 │   └── styles.css               # interface stylesheet
@@ -282,7 +291,9 @@ portfolio-risk-xray/
 │   ├── test_valuation.py
 │   ├── test_risk.py
 │   ├── test_analysis.py
-│   └── test_app_helpers.py      # presentation helpers and HTML escaping
+│   ├── test_app_helpers.py      # presentation helpers and HTML escaping
+│   └── test_streamlit_app.py    # application smoke test
+├── LICENSE
 ├── README.md
 └── pyproject.toml
 ```
@@ -306,3 +317,7 @@ Possible later research, not committed: Value at Risk, Monte Carlo simulation an
 - **No silent financial-data repair.** Invalid data stops the analysis with a clear error.
 - **Small tested modules.** Each library module has one responsibility and its own test file.
 - **Hand-checkable golden fixtures.** The sample portfolio is designed so every result can be verified with a calculator.
+
+## Licence
+
+Released under the [MIT Licence](LICENSE).

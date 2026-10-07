@@ -2,7 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from app.ui_helpers import (
+from portfolio_risk.analysis import analyse_portfolio
+from ui_helpers import (
     allocation_band_html,
     calculation_trace,
     concentration_scan_html,
@@ -18,7 +19,6 @@ from app.ui_helpers import (
     user_error_message,
     weighted_volatility_chart_html,
 )
-from portfolio_risk.analysis import analyse_portfolio
 
 MALICIOUS = "<script>alert(1)</script>"
 QUOTED = "x\" onmouseover=\"alert(1)' x='"
@@ -240,6 +240,7 @@ def test_calculation_trace_uses_engine_values(golden_analysis):
     ]
     assert "AAPL: £40,000 ÷ £100,000 = 40.0%" in trace["Portfolio weight"]
     assert "AAPL: 40.0% &gt; 25.0% is true, so above threshold" in trace["Concentration flag"]
+    assert "Displayed values are rounded; the comparison uses the exact weight." in trace["Concentration flag"]
     assert "AAPL: 40.0% × 1.80% = 0.72%" in trace["Weighted volatility component"]
     assert "0.72% + 0.45% + 0.18% + 0.00% = 1.35% per day" in trace["Weighted volatility exposure"]
 
