@@ -181,6 +181,17 @@ def test_missing_file_raises_portfolio_data_error(tmp_path):
     assert isinstance(error.value.__cause__, FileNotFoundError)
 
 
+def test_non_utf8_file_raises_portfolio_data_error(tmp_path):
+    path = tmp_path / "portfolio.csv"
+    path.write_bytes(b"ticker,quantity,price,daily_volatility\n\xff\xfeAAPL,100,400,0.018\n")
+
+    with pytest.raises(PortfolioDataError) as error:
+        load_portfolio(path)
+
+    assert str(error.value) == f"portfolio file is not valid UTF-8 text: {path}"
+    assert isinstance(error.value.__cause__, UnicodeDecodeError)
+
+
 def test_blank_row_inside_csv_rejected(write_csv):
     path = write_csv(csv_text("AAPL,100,400,0.018", "", VALID_ROW))
 

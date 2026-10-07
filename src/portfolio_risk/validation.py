@@ -48,6 +48,8 @@ def _read_csv_as_text(path: str | Path) -> pd.DataFrame:
         )
     except FileNotFoundError as error:
         raise PortfolioDataError(f"portfolio file not found: {path}") from error
+    except UnicodeDecodeError as error:
+        raise PortfolioDataError(f"portfolio file is not valid UTF-8 text: {path}") from error
     except pd.errors.EmptyDataError as error:
         raise PortfolioDataError(f"{path} is empty") from error
     except pd.errors.ParserError as error:
