@@ -1,7 +1,10 @@
 from collections.abc import Callable
 from pathlib import Path
 
+import pandas as pd
 import pytest
+
+from portfolio_risk.validation import load_portfolio
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -9,6 +12,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 @pytest.fixture
 def golden_csv_path() -> Path:
     return PROJECT_ROOT / "data" / "sample_portfolio.csv"
+
+
+@pytest.fixture
+def golden_portfolio(golden_csv_path: Path) -> pd.DataFrame:
+    """The validated £100,000 golden portfolio."""
+    return load_portfolio(golden_csv_path)
 
 
 @pytest.fixture
