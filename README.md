@@ -1,5 +1,7 @@
 # Portfolio Risk X-Ray
 
+[![Tests](https://github.com/AminQuantSystems/portfolio-risk-xray/actions/workflows/tests.yml/badge.svg)](https://github.com/AminQuantSystems/portfolio-risk-xray/actions/workflows/tests.yml)
+
 A tested Python financial-engineering project for validating portfolio data, calculating market values and weights, monitoring concentration, and producing a transparent weighted-volatility exposure diagnostic.
 
 Built around deterministic calculations, explicit assumptions and hand-checkable test fixtures.
